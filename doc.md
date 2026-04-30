@@ -13,11 +13,12 @@ Cada clase tiene `toJson()` (instancia) y `static fromJson()` para serializació
 - **Count** — una cantidad con su fecha. Máximo uno por día por counter. Si ya existe un count para ese día, se suma a él en vez de crear uno nuevo.
 - **Counter** — una cosa que querés contar (ej: "Bicep"). Tiene un array de counts que funciona como historial/calendario.
 - **Category** — agrupa counters. Puede tener una categoría padre (`parentId`), lo que permite jerarquías recursivas (ej: "Fitness" > "Gym" > "Brazos"). Tiene dos atributos de estado de acordeón: `state_gestor` y `state_conteos`, cada uno `'collapsed'` o `'expanded'`. Las categorías nuevas arrancan siempre colapsadas.
+- **State** — estado de UI de la app. Solo vive en localStorage (`contador-ui-state`), nunca se escribe al archivo JSON. Actualmente guarda `currentPanel` (panel activo). Diseñada para acumular más estados de UI a futuro.
 
 ## Arquitectura de archivos
 
-- `models.js` — clases Count, Counter, Category con toJson/fromJson
-- `services.js` — estado global (`categories[]`), persistencia, CRUD, `getTree()`, sistema de archivos
+- `models.js` — clases Count, Counter, Category, State con toJson/fromJson
+- `services.js` — estado global (`categories[]`, `appState`), persistencia, CRUD, `getTree()`, sistema de archivos
 - `renders.js` — renderizado del DOM, recursivo para el árbol de categorías
 - `events.js` — handlers de botones, navegación entre paneles, modales, init
 - `style.css` — estilos mobile-first, dark mode via variables de Bootstrap
@@ -51,16 +52,25 @@ Siempre activo via `data-bs-theme="dark"` en el tag `<html>`. Los colores custom
 
 ## Persistencia y sistema de archivos
 
-Dos capas:
+Tres capas, cada una con su propia key:
 
-1. **localStorage** (`contador-state`) — guarda automáticamente en cada operación CRUD. Actúa como backup entre sesiones.
-2. **Archivo JSON** — el botón Save escribe al archivo. Formato legible con indentación de 2 espacios.
+| Key | Contenido | Cuándo se escribe |
+|-----|-----------|-------------------|
+| `contador-state` | categorías, counters, counts, estados de acordeón | en cada CRUD y en Save |
+| `contador-ui-state` | panel activo (`State`) | al cambiar de panel |
+| `contador-filename` | nombre del último archivo abierto | al abrir o crear archivo |
+
+El archivo JSON solo contiene los datos (`contador-state`). El estado de UI nunca se exporta.
 
 ### Flujo de archivos
-- **Abrir** (`📂`): abre un `.json` existente con el File System Access API. El archivo queda asociado y cada Save escribe ahí.
-- **Nuevo** (`📄`): limpia el estado y desasocia el archivo. El primer Save pide nombre y ubicación.
-- **Save**: si hay archivo asociado escribe directo. Si no, abre el diálogo de guardar. Siempre guarda también en localStorage.
-- **Fallback**: en navegadores sin File System Access API (ej: Firefox, iOS Safari), Abrir usa `<input type="file">` y Save descarga el JSON.
+- **Abrir** (`📂`): abre un `.json` con el File System Access API. El `fileHandle` queda guardado en IndexedDB y se restaura automáticamente al recargar, sin necesidad de volver a abrir el archivo.
+- **Nuevo** (`📄`): limpia el estado y borra el handle de IndexedDB. El primer Save pide nombre y ubicación.
+- **Save**: si hay handle escribe directo al archivo. Si no, abre el diálogo de guardar. Si el permiso venció (puede pasar entre sesiones), lo repide al primer Save. Siempre guarda también en localStorage.
+- **Exportar** (`⬇`): descarga el JSON actual. Útil en móvil donde no hay File System Access API.
+- **Fallback móvil**: sin File System Access API, Save solo va a localStorage. Abrir usa `<input type="file">`. El nombre del archivo se muestra con `(local)` para indicar que no hay escritura directa al archivo.
+
+### Restauración al recargar
+Al iniciar, se restaura en orden: `appState` (panel activo) → datos de `categories` → `fileHandle` desde IndexedDB (desktop) o nombre desde localStorage (móvil) → se navega al panel donde estaba el usuario.
 
 ## Pendiente
 - Editar nombre de counter existente
