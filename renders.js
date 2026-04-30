@@ -88,9 +88,14 @@ function renderCatNodeGestor(cat, depth) {
                     ${cat.counters.map(counter => `
                         <div class="gestor-counter-row">
                             <span>${counter.name}</span>
-                            <button class="btn btn-sm btn-outline-danger" onclick="onDeleteCounter('${cat.id}','${counter.id}')">
-                                <i class="bi bi-trash"></i>
-                            </button>
+                            <div class="d-flex gap-2">
+                                <button class="btn btn-sm btn-outline-secondary" onclick="onEditCounter('${cat.id}','${counter.id}')">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="onDeleteCounter('${cat.id}','${counter.id}')">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
                         </div>
                     `).join('')}
                     ${children.map(child => renderCatNodeGestor(child, depth + 1)).join('')}

@@ -26,6 +26,25 @@ body {
     line-height: 1.2;
 }
 
+.btn-rename {
+    background: none;
+    border: none;
+    color: var(--bs-secondary-color);
+    font-size: 0.75rem;
+    padding: 2px 4px;
+    line-height: 1;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.15s;
+    align-self: flex-end;
+    margin-bottom: 2px;
+}
+
+.btn-rename:hover {
+    opacity: 1;
+    color: var(--bs-body-color);
+}
+
 /* Bottom nav */
 .bottom-nav {
     height: 60px;

@@ -25,6 +25,35 @@ function toggleCat(prefix, catId) {
 // --- Archivo ---
 
 let currentFileName = null;
+let isDirty = false;
+
+function _isMobile() {
+    return !window.showSaveFilePicker && !window.showOpenFilePicker;
+}
+
+function markDirty() {
+    isDirty = true;
+    updateSaveBtn();
+}
+
+function updateSaveBtn() {
+    const btn = document.getElementById('save-btn');
+    if (!btn) return;
+    const showDownload = _isMobile() && !isDirty;
+    btn.classList.toggle('btn-primary', !showDownload);
+    btn.classList.toggle('btn-secondary', showDownload);
+    btn.innerHTML = showDownload
+        ? '<i class="bi bi-download me-1"></i> Download'
+        : '<i class="bi bi-floppy me-1"></i> Save';
+}
+
+function onSaveBtnClick() {
+    if (_isMobile() && !isDirty) {
+        exportJson();
+    } else {
+        saveChanges();
+    }
+}
 
 function updateFilenameDisplay(name) {
     if (name !== undefined) {
@@ -43,6 +72,15 @@ function updateFilenameDisplay(name) {
     } else {
         el.textContent = currentFileName + ' (local)';
     }
+    const renameBtn = document.getElementById('btn-rename-file');
+    if (renameBtn) renameBtn.classList.toggle('d-none', !currentFileName);
+}
+
+function onRenameFile() {
+    if (!currentFileName) return;
+    const newName = prompt('Nombre del archivo:', currentFileName);
+    if (!newName || !newName.trim() || newName.trim() === currentFileName) return;
+    updateFilenameDisplay(newName.trim());
 }
 
 async function onNewFile() {
@@ -62,14 +100,16 @@ async function onOpenFile() {
 async function saveChanges() {
     persistState();
     await saveToFile();
-    updateFilenameDisplay(); // refresca sin cambiar el nombre
+    updateFilenameDisplay();
+    isDirty = false;
 
-    const btn = document.querySelector('.save-btn');
-    btn.classList.replace('btn-primary', 'btn-success');
+    const btn = document.getElementById('save-btn');
+    btn.classList.remove('btn-primary', 'btn-secondary');
+    btn.classList.add('btn-success');
     btn.innerHTML = '<i class="bi bi-check-lg me-1"></i> Guardado';
     setTimeout(() => {
-        btn.classList.replace('btn-success', 'btn-primary');
-        btn.innerHTML = '<i class="bi bi-floppy me-1"></i> Save';
+        btn.classList.remove('btn-success');
+        updateSaveBtn();
     }, 1500);
 }
 
@@ -77,6 +117,7 @@ async function saveChanges() {
 
 function onAdjust(catId, counterId, delta) {
     adjustCount(catId, counterId, delta);
+    markDirty();
     renderConteos();
 }
 
@@ -96,10 +137,23 @@ function onDeleteCounter(catId, counterId) {
 
 let _targetCatId = null;
 let _editingCatId = null;
+let _editingCounterId = null;
 
 function onOpenAddCounterModal(catId) {
     _targetCatId = catId;
+    _editingCounterId = null;
+    document.querySelector('#counterModal .modal-title').textContent = 'Nuevo contador';
     document.getElementById('counterNameInput').value = '';
+    new bootstrap.Modal(document.getElementById('counterModal')).show();
+}
+
+function onEditCounter(catId, counterId) {
+    const cat = categories.find(c => c.id === catId);
+    const counter = cat.counters.find(c => c.id === counterId);
+    _targetCatId = catId;
+    _editingCounterId = counterId;
+    document.querySelector('#counterModal .modal-title').textContent = 'Editar contador';
+    document.getElementById('counterNameInput').value = counter.name;
     new bootstrap.Modal(document.getElementById('counterModal')).show();
 }
 
@@ -140,7 +194,11 @@ function saveCategory() {
 function saveCounter() {
     const name = document.getElementById('counterNameInput').value.trim();
     if (!name) return;
-    addCounter(_targetCatId, name);
+    if (_editingCounterId) {
+        editCounter(_targetCatId, _editingCounterId, name);
+    } else {
+        addCounter(_targetCatId, name);
+    }
     bootstrap.Modal.getInstance(document.getElementById('counterModal')).hide();
     renderGestor();
 }
@@ -200,6 +258,7 @@ async function init() {
     }
 
     showPanel(appState.currentPanel);
+    updateSaveBtn();
 }
 
 init();

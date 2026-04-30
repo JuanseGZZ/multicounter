@@ -214,6 +214,15 @@ function addCounter(catId, name) {
     persistState();
 }
 
+function editCounter(catId, counterId, name) {
+    const cat = categories.find(c => c.id === catId);
+    if (!cat) return;
+    const counter = cat.counters.find(c => c.id === counterId);
+    if (!counter) return;
+    counter.name = name;
+    persistState();
+}
+
 function deleteCounter(catId, counterId) {
     const cat = categories.find(c => c.id === catId);
     if (!cat) return;

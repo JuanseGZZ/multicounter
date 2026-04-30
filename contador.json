@@ -2,7 +2,7 @@
   "categories": [
     {
       "id": "moly592dq98rv9c1mvh",
-      "name": "asasd",
+      "name": "padre",
       "parentId": null,
       "state_gestor": "expanded",
       "state_conteos": "expanded",
@@ -10,14 +10,14 @@
     },
     {
       "id": "moly5bmyied96txth3",
-      "name": "sadasa",
+      "name": "hijo",
       "parentId": "moly592dq98rv9c1mvh",
       "state_gestor": "expanded",
       "state_conteos": "expanded",
       "counters": [
         {
           "id": "moly99vn7kgscbopnf5",
-          "name": "asdasdda",
+          "name": "nieto",
           "counts": [
             {
               "cant": 20,
@@ -33,11 +33,22 @@
     },
     {
       "id": "moly5ng32dad9x60929",
-      "name": "asasdds",
+      "name": "otra categoria",
       "parentId": null,
-      "state_gestor": "collapsed",
+      "state_gestor": "expanded",
       "state_conteos": "expanded",
-      "counters": []
+      "counters": [
+        {
+          "id": "mom0ll58fan45xfv7l8",
+          "name": "otro contador",
+          "counts": [
+            {
+              "cant": 5,
+              "date": "2026-04-30T21:47:31.915Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
