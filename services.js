@@ -42,30 +42,76 @@ function persistState() {
     localStorage.setItem('contador-state', JSON.stringify(stateToJson()));
 }
 
-async function saveToFile() {
-    const data = stateToJson();
-    const json = JSON.stringify(data, null, 2);
+// --- IndexedDB: persiste el fileHandle entre recargas ---
 
-    if (window.showSaveFilePicker || window.showOpenFilePicker) {
-        // File System Access API disponible
-        if (!fileHandle) {
-            try {
-                fileHandle = await window.showSaveFilePicker({
-                    suggestedName: 'contador.json',
-                    types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
-                });
-            } catch (e) {
-                if (e.name === 'AbortError') return;
-                throw e;
-            }
-        }
-        const writable = await fileHandle.createWritable();
-        await writable.write(json);
-        await writable.close();
-    } else {
-        // Fallback: descarga
-        _downloadFallback(json, fileHandle ? fileHandle.name : 'contador.json');
+function _openHandleDB() {
+    return new Promise((resolve, reject) => {
+        const req = indexedDB.open('contador-db', 1);
+        req.onupgradeneeded = e => e.target.result.createObjectStore('handles');
+        req.onsuccess = e => resolve(e.target.result);
+        req.onerror = () => reject(req.error);
+    });
+}
+
+async function _storeFileHandle(handle) {
+    try {
+        const db = await _openHandleDB();
+        const tx = db.transaction('handles', 'readwrite');
+        const store = tx.objectStore('handles');
+        handle ? store.put(handle, 'current') : store.delete('current');
+    } catch (_) {}
+}
+
+async function loadFileHandle() {
+    try {
+        const db = await _openHandleDB();
+        return new Promise(resolve => {
+            const req = db.transaction('handles', 'readonly').objectStore('handles').get('current');
+            req.onsuccess = () => resolve(req.result || null);
+            req.onerror = () => resolve(null);
+        });
+    } catch (_) { return null; }
+}
+
+// ---
+
+async function _writeToHandle(json) {
+    // Si el permiso venció lo pedimos (sólo funciona dentro de un gesto del usuario)
+    const perm = await fileHandle.queryPermission({ mode: 'readwrite' });
+    if (perm !== 'granted') {
+        const granted = await fileHandle.requestPermission({ mode: 'readwrite' });
+        if (granted !== 'granted') return;
     }
+    const writable = await fileHandle.createWritable();
+    await writable.write(json);
+    await writable.close();
+}
+
+async function saveToFile() {
+    // Sin File System Access API (móvil/Firefox): solo localStorage, sin descarga automática
+    if (!window.showSaveFilePicker && !window.showOpenFilePicker) return;
+
+    const json = JSON.stringify(stateToJson(), null, 2);
+    if (!fileHandle) {
+        try {
+            fileHandle = await window.showSaveFilePicker({
+                suggestedName: 'contador.json',
+                types: [{ description: 'JSON', accept: { 'application/json': ['.json'] } }]
+            });
+            await _storeFileHandle(fileHandle);
+        } catch (e) {
+            if (e.name === 'AbortError') return;
+            throw e;
+        }
+    }
+    await _writeToHandle(json);
+}
+
+function exportJson() {
+    _downloadFallback(
+        JSON.stringify(stateToJson(), null, 2),
+        fileHandle ? fileHandle.name : 'contador.json'
+    );
 }
 
 async function openFile() {
@@ -82,6 +128,7 @@ async function openFile() {
         const file = await handle.getFile();
         const text = await file.text();
         fileHandle = handle;
+        await _storeFileHandle(handle);
         loadFromJson(JSON.parse(text));
         persistState();
         return handle.name;
@@ -104,6 +151,7 @@ async function openFile() {
 
 function newFile() {
     fileHandle = null;
+    _storeFileHandle(null);
     categories = [];
     persistState();
 }

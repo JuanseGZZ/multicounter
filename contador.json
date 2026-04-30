@@ -1,0 +1,39 @@
+{
+  "categories": [
+    {
+      "id": "moly592dq98rv9c1mvh",
+      "name": "asasd",
+      "parentId": null,
+      "state_gestor": "expanded",
+      "state_conteos": "expanded",
+      "counters": []
+    },
+    {
+      "id": "moly5bmyied96txth3",
+      "name": "sadasa",
+      "parentId": "moly592dq98rv9c1mvh",
+      "state_gestor": "expanded",
+      "state_conteos": "expanded",
+      "counters": [
+        {
+          "id": "moly99vn7kgscbopnf5",
+          "name": "asdasdda",
+          "counts": [
+            {
+              "cant": 20,
+              "date": "2026-04-30T20:41:59.753Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "moly5ng32dad9x60929",
+      "name": "asasdds",
+      "parentId": null,
+      "state_gestor": "collapsed",
+      "state_conteos": "expanded",
+      "counters": []
+    }
+  ]
+}

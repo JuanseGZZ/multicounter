@@ -24,8 +24,25 @@ function toggleCat(prefix, catId) {
 
 // --- Archivo ---
 
+let currentFileName = null;
+
 function updateFilenameDisplay(name) {
-    document.getElementById('app-filename').textContent = name || 'sin archivo';
+    if (name !== undefined) {
+        currentFileName = name;
+        if (name) {
+            localStorage.setItem('contador-filename', name);
+        } else {
+            localStorage.removeItem('contador-filename');
+        }
+    }
+    const el = document.getElementById('app-filename');
+    if (!currentFileName) {
+        el.textContent = 'sin archivo';
+    } else if (fileHandle) {
+        el.textContent = currentFileName;
+    } else {
+        el.textContent = currentFileName + ' (local)';
+    }
 }
 
 async function onNewFile() {
@@ -45,7 +62,7 @@ async function onOpenFile() {
 async function saveChanges() {
     persistState();
     await saveToFile();
-    updateFilenameDisplay(fileHandle ? fileHandle.name : null);
+    updateFilenameDisplay(); // refresca sin cambiar el nombre
 
     const btn = document.querySelector('.save-btn');
     btn.classList.replace('btn-primary', 'btn-success');
@@ -139,5 +156,25 @@ document.getElementById('counterNameInput').addEventListener('keydown', e => {
 
 // --- Init ---
 
-loadState();
-showPanel('conteos');
+async function init() {
+    loadState();
+
+    // Intenta restaurar el fileHandle desde IndexedDB (desktop con File System Access API)
+    if (window.showOpenFilePicker || window.showSaveFilePicker) {
+        const handle = await loadFileHandle();
+        if (handle) {
+            fileHandle = handle;
+            updateFilenameDisplay(handle.name);
+        }
+    }
+
+    // Fallback: restaura solo el nombre desde localStorage (móvil)
+    if (!currentFileName) {
+        const saved = localStorage.getItem('contador-filename');
+        if (saved && categories.length > 0) updateFilenameDisplay(saved);
+    }
+
+    showPanel('conteos');
+}
+
+init();
