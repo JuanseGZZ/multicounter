@@ -1,0 +1,230 @@
+body {
+    padding-bottom: 64px;
+}
+
+/* App header */
+.app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--bs-border-color);
+    background: var(--bs-body-bg);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.app-title {
+    font-weight: 700;
+    font-size: 1rem;
+    line-height: 1.2;
+}
+
+.app-filename {
+    font-size: 0.7rem;
+    line-height: 1.2;
+}
+
+/* Bottom nav */
+.bottom-nav {
+    height: 60px;
+}
+
+.nav-btn {
+    border: none;
+    background: none;
+    color: var(--bs-secondary-color);
+    font-size: 0.7rem;
+    padding: 6px 20px;
+    transition: color 0.15s;
+    cursor: pointer;
+}
+
+.nav-btn i {
+    font-size: 1.4rem;
+    display: block;
+}
+
+.nav-btn.active {
+    color: var(--bs-primary);
+}
+
+/* Nested category indent */
+.nested-cat {
+    margin-left: 12px;
+    padding-left: 10px;
+    border-left: 2px solid var(--bs-primary);
+    margin-top: 6px;
+}
+
+/* Category name + summary block */
+.cat-header-name {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1px;
+}
+
+.cat-summary {
+    font-size: 0.68rem;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    color: var(--bs-secondary-color);
+}
+
+/* Accordion category header */
+.cat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--bs-secondary-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 10px;
+    color: var(--bs-body-color);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.cat-header:hover {
+    background: var(--bs-tertiary-bg);
+}
+
+.cat-chevron {
+    transition: transform 0.2s ease;
+    color: var(--bs-secondary-color);
+}
+
+.cat-chevron.open {
+    transform: rotate(180deg);
+}
+
+.cat-body {
+    padding-top: 6px;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.cat-item {
+    margin-bottom: 8px;
+}
+
+/* Counter row */
+.counter-row {
+    display: flex;
+    align-items: center;
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 10px;
+    margin-bottom: 8px;
+    overflow: hidden;
+}
+
+.btn-adjust {
+    width: 56px;
+    height: 56px;
+    border: none !important;
+    border-radius: 0 !important;
+    font-size: 1.3rem;
+    flex-shrink: 0;
+}
+
+.counter-info {
+    flex: 1;
+    text-align: center;
+}
+
+.counter-info .name {
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.counter-info .today {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--bs-primary);
+}
+
+/* Save button */
+.save-btn {
+    position: fixed;
+    bottom: 68px;
+    right: 16px;
+    z-index: 1050;
+    border-radius: 50px;
+    padding: 10px 22px;
+    box-shadow: 0 3px 10px rgba(13, 110, 253, 0.4);
+    font-weight: 600;
+}
+
+/* Gestor cards */
+.gestor-card {
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.gestor-card-header {
+    display: flex;
+    align-items: center;
+    background: var(--bs-secondary-bg);
+}
+
+.gestor-toggle {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    background: none;
+    border: none;
+    color: var(--bs-body-color);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.gestor-actions {
+    display: flex;
+    gap: 6px;
+    padding: 6px 10px;
+}
+
+.gestor-counter-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-top: 1px solid var(--bs-border-color);
+}
+
+/* Calendar */
+.cal-day-header {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--bs-secondary-color);
+    margin-top: 16px;
+    margin-bottom: 6px;
+}
+
+.cal-event {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    margin-bottom: 6px;
+}

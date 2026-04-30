@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Contador</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="app-header">
+        <div>
+            <div class="app-title">Contador</div>
+            <div class="app-filename text-muted" id="app-filename">sin archivo</div>
+        </div>
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-secondary" onclick="onNewFile()" title="Nuevo archivo">
+                <i class="bi bi-file-earmark-plus"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="onOpenFile()" title="Abrir archivo">
+                <i class="bi bi-folder2-open"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Fallback file input para navegadores sin File System Access API -->
+    <input type="file" id="fileInput" accept=".json" class="d-none">
+
+    <!-- Panel: Conteos -->
+    <div id="panel-conteos" class="panel p-3">
+        <h5 class="fw-bold mb-1">Conteos</h5>
+        <div id="conteos-list" class="mt-2"></div>
+        <button class="save-btn btn btn-primary" onclick="saveChanges()">
+            <i class="bi bi-floppy me-1"></i> Save
+        </button>
+    </div>
+
+    <!-- Panel: Gestor -->
+    <div id="panel-gestor" class="panel p-3 d-none">
+        <h5 class="fw-bold mb-3">Gestor</h5>
+        <div id="gestor-list"></div>
+        <button class="btn btn-success w-100 mt-2" onclick="openAddCategoryModal()">
+            <i class="bi bi-plus-circle me-1"></i> Nueva categoría
+        </button>
+    </div>
+
+    <!-- Panel: Calendario -->
+    <div id="panel-calendario" class="panel p-3 d-none">
+        <h5 class="fw-bold mb-1">Calendario</h5>
+        <div id="calendario-list" class="mt-2"></div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav fixed-bottom bg-body border-top d-flex justify-content-around align-items-center">
+        <button id="nav-gestor" class="nav-btn d-flex flex-column align-items-center" onclick="showPanel('gestor')">
+            <i class="bi bi-grid-1x2"></i>
+            Gestor
+        </button>
+        <button id="nav-conteos" class="nav-btn active d-flex flex-column align-items-center" onclick="showPanel('conteos')">
+            <i class="bi bi-plus-slash-minus"></i>
+            Conteos
+        </button>
+        <button id="nav-calendario" class="nav-btn d-flex flex-column align-items-center" onclick="showPanel('calendario')">
+            <i class="bi bi-calendar3"></i>
+            Calendario
+        </button>
+    </nav>
+
+    <!-- Modal: Nueva Categoría -->
+    <div class="modal fade" id="categoryModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nueva categoría</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="categoryNameInput" class="form-control" placeholder="Nombre (ej: Gym)">
+                    <select id="categoryParentSelect" class="form-select mt-2">
+                        <option value="">Sin categoría padre</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" onclick="saveCategory()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Nuevo Contador -->
+    <div class="modal fade" id="counterModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Nuevo contador</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" id="counterNameInput" class="form-control" placeholder="Nombre (ej: Bicep)">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button class="btn btn-primary" onclick="saveCounter()">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="models.js"></script>
+    <script src="services.js"></script>
+    <script src="renders.js"></script>
+    <script src="events.js"></script>
+</body>
+</html>
