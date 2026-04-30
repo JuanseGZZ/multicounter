@@ -145,6 +145,30 @@ function saveCounter() {
     renderGestor();
 }
 
+// --- Calendario ---
+
+function prevMonth() {
+    if (appState.calendarMonth === 0) { appState.calendarMonth = 11; appState.calendarYear--; }
+    else { appState.calendarMonth--; }
+    appState.calendarSelectedDay = null;
+    persistAppState();
+    renderCalendario();
+}
+
+function nextMonth() {
+    if (appState.calendarMonth === 11) { appState.calendarMonth = 0; appState.calendarYear++; }
+    else { appState.calendarMonth++; }
+    appState.calendarSelectedDay = null;
+    persistAppState();
+    renderCalendario();
+}
+
+function selectCalDay(day) {
+    appState.calendarSelectedDay = appState.calendarSelectedDay === day ? null : day;
+    persistAppState();
+    renderCalendario();
+}
+
 // --- Teclado ---
 
 document.getElementById('categoryNameInput').addEventListener('keydown', e => {

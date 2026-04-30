@@ -114,54 +114,79 @@ function renderGestor() {
 
 function renderCalendario() {
     const list = document.getElementById('calendario-list');
+    const { calendarYear: year, calendarMonth: month, calendarSelectedDay: selDay } = appState;
 
-    const events = [];
+    // Días con actividad en este mes
+    const activityDays = new Set();
+    const allEvents = [];
     categories.forEach(cat => {
         cat.counters.forEach(counter => {
             counter.counts.forEach(count => {
-                if (count.cant > 0) {
-                    events.push({
-                        dateObj: new Date(count.date),
-                        catName: cat.name,
-                        counterName: counter.name,
-                        cant: count.cant
-                    });
+                if (count.cant <= 0) return;
+                const d = new Date(count.date);
+                if (d.getFullYear() === year && d.getMonth() === month) {
+                    activityDays.add(d.getDate());
+                    allEvents.push({ dateObj: d, day: d.getDate(), catName: cat.name, counterName: counter.name, cant: count.cant });
                 }
             });
         });
     });
+    allEvents.sort((a, b) => b.dateObj - a.dateObj);
 
-    if (events.length === 0) {
-        list.innerHTML = '<p class="text-muted text-center mt-5">No hay registros aún.</p>';
-        return;
+    // Cabecera de mes
+    const monthLabel = new Date(year, month, 1)
+        .toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+
+    // Grid de días
+    const DAY_NAMES = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá', 'Do'];
+    const firstDow = new Date(year, month, 1).getDay(); // 0=Dom
+    const offset = (firstDow + 6) % 7;                  // lunes=0
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const today = new Date();
+    const isThisMonth = today.getFullYear() === year && today.getMonth() === month;
+
+    const headerCells = DAY_NAMES.map(h => `<div class="cal-hcell">${h}</div>`).join('');
+    let dayCells = '<div class="cal-cell-empty"></div>'.repeat(offset);
+    for (let d = 1; d <= daysInMonth; d++) {
+        const hasAct  = activityDays.has(d);
+        const isToday = isThisMonth && d === today.getDate();
+        const isSel   = d === selDay;
+        const cls = ['cal-cell', hasAct ? 'has-act' : '', isToday ? 'is-today' : '', isSel ? 'is-sel' : ''].filter(Boolean).join(' ');
+        dayCells += `<div class="${cls}" onclick="selectCalDay(${d})">${d}${hasAct ? '<span class="act-dot"></span>' : ''}</div>`;
     }
 
-    const byDay = {};
-    events.forEach(e => {
-        const d = e.dateObj;
-        const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-        if (!byDay[key]) byDay[key] = [];
-        byDay[key].push(e);
-    });
+    // Lista de actividad filtrada
+    const filtered = selDay ? allEvents.filter(e => e.day === selDay) : allEvents;
+    const listLabel = selDay
+        ? `Día ${selDay} de ${new Date(year, month, selDay).toLocaleDateString('es-AR', { month: 'long' })}`
+        : 'Este mes';
 
-    const sortedDays = Object.keys(byDay).sort((a, b) => b.localeCompare(a));
-
-    list.innerHTML = sortedDays.map(key => {
-        const [y, m, d] = key.split('-');
-        const label = new Date(y, m - 1, d).toLocaleDateString('es-AR', {
-            weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
-        });
-        return `
-            <div class="cal-day-header">${label}</div>
-            ${byDay[key].map(e => `
-                <div class="cal-event">
-                    <div>
-                        <span class="fw-medium">${e.counterName}</span>
-                        <span class="text-muted small ms-1">${e.catName}</span>
-                    </div>
-                    <span class="badge bg-primary rounded-pill">${e.cant}</span>
+    const activityHtml = filtered.length === 0
+        ? '<p class="text-muted small text-center mt-2">Sin actividad.</p>'
+        : filtered.map(e => `
+            <div class="cal-event">
+                <div>
+                    <span class="fw-medium">${e.counterName}</span>
+                    <span class="text-muted small ms-1">${e.catName}</span>
                 </div>
-            `).join('')}
-        `;
-    }).join('');
+                <div class="text-end">
+                    <span class="badge bg-primary rounded-pill">${e.cant}</span>
+                    <div class="cal-event-day">${e.day}</div>
+                </div>
+            </div>`).join('');
+
+    list.innerHTML = `
+        <div class="cal-nav">
+            <button class="btn btn-sm btn-outline-secondary" onclick="prevMonth()"><i class="bi bi-chevron-left"></i></button>
+            <span class="cal-month-title">${monthLabel}</span>
+            <button class="btn btn-sm btn-outline-secondary" onclick="nextMonth()"><i class="bi bi-chevron-right"></i></button>
+        </div>
+        <div class="cal-grid">
+            ${headerCells}
+            ${dayCells}
+        </div>
+        <div class="mt-3">
+            <div class="cal-section-label">${listLabel}</div>
+            ${activityHtml}
+        </div>`;
 }

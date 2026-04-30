@@ -38,15 +38,26 @@ class Counter {
 class State {
     constructor() {
         this.currentPanel = 'conteos';
+        this.calendarYear = new Date().getFullYear();
+        this.calendarMonth = new Date().getMonth();
+        this.calendarSelectedDay = null;
     }
 
     toJson() {
-        return { currentPanel: this.currentPanel };
+        return {
+            currentPanel: this.currentPanel,
+            calendarYear: this.calendarYear,
+            calendarMonth: this.calendarMonth,
+            calendarSelectedDay: this.calendarSelectedDay
+        };
     }
 
     static fromJson(obj) {
         const s = new State();
         s.currentPanel = obj.currentPanel || 'conteos';
+        s.calendarYear = obj.calendarYear ?? new Date().getFullYear();
+        s.calendarMonth = obj.calendarMonth ?? new Date().getMonth();
+        s.calendarSelectedDay = obj.calendarSelectedDay ?? null;
         return s;
     }
 }
