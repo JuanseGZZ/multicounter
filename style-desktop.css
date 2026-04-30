@@ -1,0 +1,160 @@
+/* ================================================
+   style-desktop.css — overrides para >= 768px
+   El base mobile está en style.css
+   ================================================ */
+
+@media (min-width: 768px) {
+
+    /* ---- Fondo exterior ---- */
+    body {
+        background: var(--bs-tertiary-bg);
+    }
+
+    /* ---- Ancho máximo centrado ---- */
+    .app-header {
+        max-width: 860px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 14px 32px;
+        border-left: 1px solid var(--bs-border-color);
+        border-right: 1px solid var(--bs-border-color);
+        border-radius: 0 0 0 0;
+    }
+
+    .panel {
+        max-width: 860px;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 28px 36px !important;
+        background: var(--bs-body-bg);
+        border-left: 1px solid var(--bs-border-color);
+        border-right: 1px solid var(--bs-border-color);
+        min-height: calc(100vh - 130px);
+    }
+
+    /* Bottom nav fijo centrado */
+    .bottom-nav {
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(860px, 100%);
+        border-left: 1px solid var(--bs-border-color);
+        border-right: 1px solid var(--bs-border-color);
+        height: 64px;
+    }
+
+    .nav-btn {
+        font-size: 0.78rem;
+        padding: 6px 32px;
+    }
+
+    .nav-btn i {
+        font-size: 1.3rem;
+    }
+
+    /* Save button: 20px desde el borde derecho del contenido */
+    .save-btn {
+        right: max(calc((100vw - 860px) / 2 + 20px), 20px);
+        bottom: 76px;
+        padding: 12px 28px;
+        font-size: 1rem;
+    }
+
+    /* ---- Títulos de panel ---- */
+    .panel h5 {
+        font-size: 1.2rem;
+        margin-bottom: 16px !important;
+    }
+
+    /* ---- Conteos: counters en 2 columnas ---- */
+    .cat-body {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding-top: 6px;
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    /* Las subcategorías siempre span completo */
+    .nested-cat {
+        grid-column: 1 / -1;
+    }
+
+    .counter-row {
+        margin-bottom: 0;
+        border-radius: 12px;
+    }
+
+    .btn-adjust {
+        width: 64px;
+        height: 64px;
+        font-size: 1.4rem;
+    }
+
+    .counter-info .name {
+        font-size: 1rem;
+    }
+
+    .counter-info .today {
+        font-size: 1.4rem;
+    }
+
+    /* ---- Gestor ---- */
+    .cat-header {
+        font-size: 0.9rem;
+        padding: 12px 18px;
+    }
+
+    .gestor-card {
+        border-radius: 12px;
+    }
+
+    #panel-gestor .btn.btn-success {
+        width: auto !important;
+        padding-left: 24px;
+        padding-right: 24px;
+    }
+
+    /* ---- Calendario ---- */
+    .cal-nav {
+        max-width: 520px;
+        margin: 0 auto 8px;
+    }
+
+    .cal-month-title {
+        font-size: 1.1rem;
+    }
+
+    .cal-grid {
+        max-width: 520px;
+        margin: 0 auto;
+        gap: 6px;
+    }
+
+    .cal-cell {
+        font-size: 1rem;
+        border-radius: 10px;
+    }
+
+    .cal-hcell {
+        font-size: 0.72rem;
+        padding: 6px 0;
+    }
+
+    .act-dot {
+        width: 5px;
+        height: 5px;
+        bottom: 4px;
+    }
+
+    .cal-event {
+        padding: 10px 16px;
+        border-radius: 10px;
+    }
+
+    /* ---- Modales más cómodos ---- */
+    .modal-dialog {
+        max-width: 460px;
+    }
+
+}

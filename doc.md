@@ -13,7 +13,7 @@ Cada clase tiene `toJson()` (instancia) y `static fromJson()` para serializació
 - **Count** — una cantidad con su fecha. Máximo uno por día por counter. Si ya existe un count para ese día, se suma a él en vez de crear uno nuevo.
 - **Counter** — una cosa que querés contar (ej: "Bicep"). Tiene un array de counts que funciona como historial/calendario.
 - **Category** — agrupa counters. Puede tener una categoría padre (`parentId`), lo que permite jerarquías recursivas (ej: "Fitness" > "Gym" > "Brazos"). Tiene dos atributos de estado de acordeón: `state_gestor` y `state_conteos`, cada uno `'collapsed'` o `'expanded'`. Las categorías nuevas arrancan siempre colapsadas.
-- **State** — estado de UI de la app. Solo vive en localStorage (`contador-ui-state`), nunca se escribe al archivo JSON. Actualmente guarda `currentPanel` (panel activo). Diseñada para acumular más estados de UI a futuro.
+- **State** — estado de UI de la app. Solo vive en localStorage (`contador-ui-state`), nunca se escribe al archivo JSON. Guarda: `currentPanel` (panel activo), `calendarYear`, `calendarMonth` (mes visible en el calendario), `calendarSelectedDay` (día seleccionado o null). Diseñada para acumular más estados de UI a futuro.
 
 ## Arquitectura de archivos
 
@@ -27,13 +27,15 @@ Cada clase tiene `toJson()` (instancia) y `static fromJson()` para serializació
 ## Paneles
 
 ### Conteos
-Lista de categorías con sus counters. Por cada counter: botón `−`, nombre + número del día, botón `+`. Botón sticky **Save** abajo a la derecha.
+Lista de categorías con sus counters. Por cada counter: botón `−`, nombre + **total histórico acumulado**, botón `+`. El número mostrado es la suma de todos los counts de toda la historia (`getTotalAllTime`), no el del día. Botón sticky **Save** abajo a la derecha.
 
 ### Gestor
 CRUD de categorías y counters. Crear categoría (con padre opcional), editar nombre y padre, agregar counters, eliminar. El botón de editar (lápiz) abre el mismo modal de creación precargado con los datos actuales.
 
 ### Calendario
-Historial de conteos agrupados por día, orden descendente. Muestra counter, categoría y cantidad.
+Dos secciones:
+- **Grid del mes** — cuadrícula real de 7 columnas (Lu→Do) con el mes actualmente navegado. Días con actividad tienen un punto azul. El día de hoy tiene borde azul. Se navega con `‹` `›`. El mes y año visitado se persisten en `appState`.
+- **Lista de historial** — debajo del grid, muestra **todo el historial** de todos los tiempos, del más reciente al más antiguo, con fecha completa en cada entrada. Al tocar un día del grid se filtra la lista a ese día en ese mes específico; tocarlo de nuevo vuelve al historial completo.
 
 ## Navegación
 Nav fijo en la parte inferior con tres tabs: Gestor / Conteos / Calendario.
