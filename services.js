@@ -31,6 +31,10 @@ function getTodayTotal(counter) {
     return tc ? tc.cant : 0;
 }
 
+function getTotalAllTime(counter) {
+    return counter.counts.reduce((sum, c) => sum + c.cant, 0);
+}
+
 // --- Serialización ---
 
 function stateToJson() {

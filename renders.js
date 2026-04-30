@@ -29,7 +29,7 @@ function renderCatNodeConteos(cat, depth) {
                         </button>
                         <div class="counter-info">
                             <div class="name">${counter.name}</div>
-                            <div class="today">${getTodayTotal(counter)}</div>
+                            <div class="today">${getTotalAllTime(counter)}</div>
                         </div>
                         <button class="btn-adjust btn btn-outline-success" onclick="onAdjust('${cat.id}','${counter.id}',1)">
                             <i class="bi bi-plus-lg"></i>
@@ -116,8 +116,9 @@ function renderCalendario() {
     const list = document.getElementById('calendario-list');
     const { calendarYear: year, calendarMonth: month, calendarSelectedDay: selDay } = appState;
 
-    // Días con actividad en este mes
+    // Días con actividad en el mes visible (para el grid)
     const activityDays = new Set();
+    // Todos los eventos históricos (para la lista)
     const allEvents = [];
     categories.forEach(cat => {
         cat.counters.forEach(counter => {
@@ -126,8 +127,8 @@ function renderCalendario() {
                 const d = new Date(count.date);
                 if (d.getFullYear() === year && d.getMonth() === month) {
                     activityDays.add(d.getDate());
-                    allEvents.push({ dateObj: d, day: d.getDate(), catName: cat.name, counterName: counter.name, cant: count.cant });
                 }
+                allEvents.push({ dateObj: d, day: d.getDate(), month: d.getMonth(), year: d.getFullYear(), catName: cat.name, counterName: counter.name, cant: count.cant });
             });
         });
     });
@@ -155,15 +156,19 @@ function renderCalendario() {
         dayCells += `<div class="${cls}" onclick="selectCalDay(${d})">${d}${hasAct ? '<span class="act-dot"></span>' : ''}</div>`;
     }
 
-    // Lista de actividad filtrada
-    const filtered = selDay ? allEvents.filter(e => e.day === selDay) : allEvents;
+    // Lista: todo el historial, o solo el día seleccionado en el mes visible
+    const filtered = selDay
+        ? allEvents.filter(e => e.day === selDay && e.month === month && e.year === year)
+        : allEvents;
     const listLabel = selDay
-        ? `Día ${selDay} de ${new Date(year, month, selDay).toLocaleDateString('es-AR', { month: 'long' })}`
-        : 'Este mes';
+        ? `${selDay} de ${new Date(year, month, selDay).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })}`
+        : 'Historial completo';
 
     const activityHtml = filtered.length === 0
         ? '<p class="text-muted small text-center mt-2">Sin actividad.</p>'
-        : filtered.map(e => `
+        : filtered.map(e => {
+            const dateLabel = e.dateObj.toLocaleDateString('es-AR', { day: 'numeric', month: 'short', year: 'numeric' });
+            return `
             <div class="cal-event">
                 <div>
                     <span class="fw-medium">${e.counterName}</span>
@@ -171,9 +176,10 @@ function renderCalendario() {
                 </div>
                 <div class="text-end">
                     <span class="badge bg-primary rounded-pill">${e.cant}</span>
-                    <div class="cal-event-day">${e.day}</div>
+                    <div class="cal-event-day">${dateLabel}</div>
                 </div>
-            </div>`).join('');
+            </div>`;
+        }).join('');
 
     list.innerHTML = `
         <div class="cal-nav">
