@@ -35,6 +35,22 @@ class Counter {
     }
 }
 
+class State {
+    constructor() {
+        this.currentPanel = 'conteos';
+    }
+
+    toJson() {
+        return { currentPanel: this.currentPanel };
+    }
+
+    static fromJson(obj) {
+        const s = new State();
+        s.currentPanel = obj.currentPanel || 'conteos';
+        return s;
+    }
+}
+
 class Category {
     constructor(name, parent = null) {
         this.name = name;

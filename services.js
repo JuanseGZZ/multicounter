@@ -1,5 +1,15 @@
 let categories = [];
 let fileHandle = null;
+let appState = new State();
+
+function loadAppState() {
+    const saved = localStorage.getItem('contador-ui-state');
+    if (saved) appState = State.fromJson(JSON.parse(saved));
+}
+
+function persistAppState() {
+    localStorage.setItem('contador-ui-state', JSON.stringify(appState.toJson()));
+}
 
 function genId() {
     return Date.now().toString(36) + Math.random().toString(36).slice(2);

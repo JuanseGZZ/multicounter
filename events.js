@@ -1,15 +1,15 @@
 const panels = ['conteos', 'gestor', 'calendario'];
-let currentPanel = 'conteos';
 
 function showPanel(name) {
-    currentPanel = name;
+    appState.currentPanel = name;
+    persistAppState();
     panels.forEach(p => {
-        document.getElementById(`panel-${p}`).classList.toggle('d-none', p !== name);
-        document.getElementById(`nav-${p}`).classList.toggle('active', p === name);
+        document.getElementById(`panel-${p}`).classList.toggle('d-none', p !== appState.currentPanel);
+        document.getElementById(`nav-${p}`).classList.toggle('active', p === appState.currentPanel);
     });
-    if (name === 'conteos') renderConteos();
-    if (name === 'gestor') renderGestor();
-    if (name === 'calendario') renderCalendario();
+    if (appState.currentPanel === 'conteos') renderConteos();
+    if (appState.currentPanel === 'gestor') renderGestor();
+    if (appState.currentPanel === 'calendario') renderCalendario();
 }
 
 function toggleCat(prefix, catId) {
@@ -49,14 +49,14 @@ async function onNewFile() {
     if (!confirm('¿Crear nuevo? Los cambios no guardados se perderán.')) return;
     newFile();
     updateFilenameDisplay(null);
-    showPanel(currentPanel);
+    showPanel(appState.currentPanel);
 }
 
 async function onOpenFile() {
     const name = await openFile();
     if (name === null) return;
     updateFilenameDisplay(name);
-    showPanel(currentPanel);
+    showPanel(appState.currentPanel);
 }
 
 async function saveChanges() {
@@ -157,6 +157,7 @@ document.getElementById('counterNameInput').addEventListener('keydown', e => {
 // --- Init ---
 
 async function init() {
+    loadAppState();
     loadState();
 
     // Intenta restaurar el fileHandle desde IndexedDB (desktop con File System Access API)
@@ -174,7 +175,7 @@ async function init() {
         if (saved && categories.length > 0) updateFilenameDisplay(saved);
     }
 
-    showPanel('conteos');
+    showPanel(appState.currentPanel);
 }
 
 init();
