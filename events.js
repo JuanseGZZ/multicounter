@@ -121,6 +121,33 @@ function onAdjust(catId, counterId, delta) {
     renderConteos();
 }
 
+function onEditCounterValue(catId, counterId, el) {
+    const current = getTotalAllTime(
+        categories.find(c => c.id === catId)?.counters.find(c => c.id === counterId) || { counts: [] }
+    );
+    el.innerHTML = `<input type="number" class="counter-edit-input" value="${current}" min="0">`;
+    const input = el.querySelector('input');
+    input.focus();
+    input.select();
+
+    let committed = false;
+    function commit() {
+        if (committed) return;
+        committed = true;
+        const val = parseInt(input.value);
+        if (!isNaN(val) && val !== current) {
+            setCount(catId, counterId, val);
+            markDirty();
+        }
+        renderConteos();
+    }
+    input.addEventListener('keydown', e => {
+        if (e.key === 'Enter') commit();
+        if (e.key === 'Escape') { committed = true; renderConteos(); }
+    });
+    input.addEventListener('blur', commit);
+}
+
 // --- Gestor ---
 
 function onDeleteCategory(catId) {

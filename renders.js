@@ -29,7 +29,7 @@ function renderCatNodeConteos(cat, depth) {
                         </button>
                         <div class="counter-info">
                             <div class="name">${counter.name}</div>
-                            <div class="today">${getTotalAllTime(counter)}</div>
+                            <div class="today" ondblclick="onEditCounterValue('${cat.id}','${counter.id}',this)">${getTotalAllTime(counter)}</div>
                         </div>
                         <button class="btn-adjust btn btn-outline-success" onclick="onAdjust('${cat.id}','${counter.id}',1)">
                             <i class="bi bi-plus-lg"></i>

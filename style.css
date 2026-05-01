@@ -169,6 +169,26 @@ body {
     font-size: 1.1rem;
     font-weight: 700;
     color: var(--bs-primary);
+    cursor: default;
+}
+
+.counter-edit-input {
+    width: 80px;
+    text-align: center;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--bs-primary);
+    background: var(--bs-body-bg);
+    border: 2px solid var(--bs-primary);
+    border-radius: 6px;
+    padding: 0 4px;
+    outline: none;
+    /* hide spinner arrows */
+    -moz-appearance: textfield;
+}
+.counter-edit-input::-webkit-outer-spin-button,
+.counter-edit-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
 }
 
 /* Save button */

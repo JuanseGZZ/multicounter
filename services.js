@@ -245,6 +245,24 @@ function getTree() {
     return roots;
 }
 
+function setCount(catId, counterId, totalValue) {
+    const cat = categories.find(c => c.id === catId);
+    if (!cat) return;
+    const counter = cat.counters.find(c => c.id === counterId);
+    if (!counter) return;
+    const today = new Date();
+    const restTotal = counter.counts
+        .filter(c => !isSameDay(new Date(c.date), today))
+        .reduce((sum, c) => sum + c.cant, 0);
+    let todayCount = getTodayCount(counter);
+    if (!todayCount) {
+        todayCount = new Count(0, today);
+        counter.counts.push(todayCount);
+    }
+    todayCount.cant = Math.max(0, totalValue - restTotal);
+    persistState();
+}
+
 function adjustCount(catId, counterId, delta) {
     const cat = categories.find(c => c.id === catId);
     if (!cat) return;
