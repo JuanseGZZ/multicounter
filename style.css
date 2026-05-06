@@ -193,7 +193,7 @@ body {
 
 /* Extra scroll room so the floating save button never covers the last counter */
 #conteos-list {
-    padding-bottom: 88px;
+    padding-bottom: 188px;
 }
 
 /* Save button */
