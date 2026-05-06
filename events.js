@@ -125,7 +125,7 @@ function onEditCounterValue(catId, counterId, el) {
     const current = getTotalAllTime(
         categories.find(c => c.id === catId)?.counters.find(c => c.id === counterId) || { counts: [] }
     );
-    el.innerHTML = `<input type="number" class="counter-edit-input" value="${current}" min="0">`;
+    el.innerHTML = `<input type="number" class="counter-edit-input" value="${current}">`;
     const input = el.querySelector('input');
     input.focus();
     input.select();

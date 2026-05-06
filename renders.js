@@ -128,7 +128,6 @@ function renderCalendario() {
     categories.forEach(cat => {
         cat.counters.forEach(counter => {
             counter.counts.forEach(count => {
-                if (count.cant <= 0) return;
                 const d = new Date(count.date);
                 if (d.getFullYear() === year && d.getMonth() === month) {
                     activityDays.add(d.getDate());

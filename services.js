@@ -259,7 +259,7 @@ function setCount(catId, counterId, totalValue) {
         todayCount = new Count(0, today);
         counter.counts.push(todayCount);
     }
-    todayCount.cant = Math.max(0, totalValue - restTotal);
+    todayCount.cant = totalValue - restTotal;
     persistState();
 }
 
@@ -273,5 +273,6 @@ function adjustCount(catId, counterId, delta) {
         todayCount = new Count(0, new Date());
         counter.counts.push(todayCount);
     }
-    todayCount.cant = Math.max(0, todayCount.cant + delta);
+    todayCount.cant = todayCount.cant + delta;
+    persistState();
 }
