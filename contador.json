@@ -26,6 +26,10 @@
             {
               "cant": 5,
               "date": "2026-04-30T21:23:43.275Z"
+            },
+            {
+              "cant": -8,
+              "date": "2026-05-06T23:05:21.718Z"
             }
           ]
         }
@@ -33,22 +37,11 @@
     },
     {
       "id": "moly5ng32dad9x60929",
-      "name": "otra categoria",
+      "name": "asasdds",
       "parentId": null,
-      "state_gestor": "expanded",
+      "state_gestor": "collapsed",
       "state_conteos": "expanded",
-      "counters": [
-        {
-          "id": "mom0ll58fan45xfv7l8",
-          "name": "otro contador",
-          "counts": [
-            {
-              "cant": 5,
-              "date": "2026-04-30T21:47:31.915Z"
-            }
-          ]
-        }
-      ]
+      "counters": []
     }
   ]
 }
