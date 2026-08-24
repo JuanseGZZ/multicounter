@@ -27,8 +27,9 @@ function toggleCat(prefix, catId) {
 let currentFileName = null;
 let isDirty = false;
 
-function _isMobile() {
-    return !window.showSaveFilePicker && !window.showOpenFilePicker;
+function _hasFileSaveAccess() {
+    if (_isRunIt()) return !!runitFileId;
+    return !!(window.showSaveFilePicker || window.showOpenFilePicker);
 }
 
 function markDirty() {
@@ -39,7 +40,7 @@ function markDirty() {
 function updateSaveBtn() {
     const btn = document.getElementById('save-btn');
     if (!btn) return;
-    const showDownload = _isMobile() && !isDirty;
+    const showDownload = !_hasFileSaveAccess() && !isDirty;
     btn.classList.toggle('btn-primary', !showDownload);
     btn.classList.toggle('btn-secondary', showDownload);
     btn.innerHTML = showDownload
@@ -47,11 +48,11 @@ function updateSaveBtn() {
         : '<i class="bi bi-floppy me-1"></i> Save';
 }
 
-function onSaveBtnClick() {
-    if (_isMobile() && !isDirty) {
-        exportJson();
+async function onSaveBtnClick() {
+    if (!_hasFileSaveAccess() && !isDirty) {
+        await exportJson();
     } else {
-        saveChanges();
+        await saveChanges();
     }
 }
 
@@ -67,7 +68,7 @@ function updateFilenameDisplay(name) {
     const el = document.getElementById('app-filename');
     if (!currentFileName) {
         el.textContent = 'sin archivo';
-    } else if (fileHandle) {
+    } else if (fileHandle || (_isRunIt() && runitFileId)) {
         el.textContent = currentFileName;
     } else {
         el.textContent = currentFileName + ' (local)';
@@ -102,6 +103,7 @@ async function saveChanges() {
     await saveToFile();
     updateFilenameDisplay();
     isDirty = false;
+    updateSaveBtn();
 
     const btn = document.getElementById('save-btn');
     btn.classList.remove('btn-primary', 'btn-secondary');
@@ -269,19 +271,30 @@ async function init() {
     loadAppState();
     loadState();
 
-    // Intenta restaurar el fileHandle desde IndexedDB (desktop con File System Access API)
-    if (window.showOpenFilePicker || window.showSaveFilePicker) {
-        const handle = await loadFileHandle();
-        if (handle) {
-            fileHandle = handle;
-            updateFilenameDisplay(handle.name);
+    if (_isRunIt()) {
+        // Restaurar referencia de archivo desde RunIt.storage
+        const id   = await RunIt.storage.get('runit-file-id');
+        const name = await RunIt.storage.get('runit-file-name');
+        if (id && name) {
+            runitFileId   = id;
+            runitFileName = name;
+            updateFilenameDisplay(name);
         }
-    }
+    } else {
+        // Intenta restaurar el fileHandle desde IndexedDB (desktop con File System Access API)
+        if (window.showOpenFilePicker || window.showSaveFilePicker) {
+            const handle = await loadFileHandle();
+            if (handle) {
+                fileHandle = handle;
+                updateFilenameDisplay(handle.name);
+            }
+        }
 
-    // Fallback: restaura solo el nombre desde localStorage (móvil)
-    if (!currentFileName) {
-        const saved = localStorage.getItem('contador-filename');
-        if (saved && categories.length > 0) updateFilenameDisplay(saved);
+        // Fallback: restaura solo el nombre desde localStorage (móvil)
+        if (!currentFileName) {
+            const saved = localStorage.getItem('contador-filename');
+            if (saved && categories.length > 0) updateFilenameDisplay(saved);
+        }
     }
 
     showPanel(appState.currentPanel);

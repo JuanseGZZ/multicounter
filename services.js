@@ -1,6 +1,12 @@
 let categories = [];
 let fileHandle = null;
+let runitFileId = null;
+let runitFileName = null;
 let appState = new State();
+
+function _isRunIt() {
+    return !!(window.RunIt && window.RunIt.files);
+}
 
 function loadAppState() {
     const saved = localStorage.getItem('contador-ui-state');
@@ -101,7 +107,39 @@ async function _writeToHandle(json) {
     await writable.close();
 }
 
+async function _saveToRunItFile() {
+    const json = JSON.stringify(stateToJson(), null, 2);
+    try {
+        await RunIt.files.save(runitFileId, json);
+    } catch (e) {
+        // Permiso vencido — intentar re-abrir el archivo
+        RunIt.ui.toast('Permiso vencido, reabrí el archivo', { type: 'warning', duration: 3000 });
+        let file = null;
+        try { file = await RunIt.files.open({ types: ['json'] }); } catch (_) {}
+        if (file) {
+            runitFileId = file.id;
+            runitFileName = file.name;
+            RunIt.storage.set('runit-file-id', file.id);
+            RunIt.storage.set('runit-file-name', file.name);
+            try {
+                await RunIt.files.save(runitFileId, json);
+                return;
+            } catch (_) {}
+        }
+        // Fallback final: exportar via share sheet (reemplaza el archivo y restaura permisos)
+        const name = runitFileName || 'contador.json';
+        const b64 = btoa(unescape(encodeURIComponent(json)));
+        await RunIt.files.export(name, b64, 'application/json');
+    }
+}
+
 async function saveToFile() {
+    if (_isRunIt()) {
+        if (!runitFileId) return;
+        await _saveToRunItFile();
+        return;
+    }
+
     // Sin File System Access API (móvil/Firefox): solo localStorage, sin descarga automática
     if (!window.showSaveFilePicker && !window.showOpenFilePicker) return;
 
@@ -121,14 +159,31 @@ async function saveToFile() {
     await _writeToHandle(json);
 }
 
-function exportJson() {
-    _downloadFallback(
-        JSON.stringify(stateToJson(), null, 2),
-        fileHandle ? fileHandle.name : 'contador.json'
-    );
+async function exportJson() {
+    const json = JSON.stringify(stateToJson(), null, 2);
+    const name = runitFileName || (fileHandle ? fileHandle.name : 'contador.json');
+    if (_isRunIt()) {
+        const b64 = btoa(unescape(encodeURIComponent(json)));
+        await RunIt.files.export(name, b64, 'application/json');
+        return;
+    }
+    _downloadFallback(json, name);
 }
 
 async function openFile() {
+    if (_isRunIt()) {
+        let file;
+        try { file = await RunIt.files.open({ types: ['json'] }); } catch (e) { return null; }
+        if (!file) return null;
+        runitFileId = file.id;
+        runitFileName = file.name;
+        RunIt.storage.set('runit-file-id', file.id);
+        RunIt.storage.set('runit-file-name', file.name);
+        loadFromJson(JSON.parse(file.content));
+        persistState();
+        return file.name;
+    }
+
     if (window.showOpenFilePicker) {
         let handle;
         try {
@@ -166,6 +221,12 @@ async function openFile() {
 function newFile() {
     fileHandle = null;
     _storeFileHandle(null);
+    if (_isRunIt()) {
+        runitFileId = null;
+        runitFileName = null;
+        RunIt.storage.remove('runit-file-id');
+        RunIt.storage.remove('runit-file-name');
+    }
     categories = [];
     persistState();
 }

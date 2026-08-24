@@ -1,0 +1,10 @@
+{
+  "id": "com.juan.multicounter",
+  "name": "Contador",
+  "version": "1.0.0",
+  "author": "Juan",
+  "description": "Multi-contador con historial y calendario",
+  "entry": "index.html",
+  "permissions": ["files"],
+  "runit_version": "1"
+}
